@@ -3,17 +3,10 @@
 /* ASCII FRAME size */
 #define ASCII_FRAME_SIZE 60  //CHANGE  
 
-/* ASCII FRAME END CHARS */
-#define CR 0x0D
-#define LF 0x0A
-
 /* ASCII FRAME */
-uint8 idata ascii_frame[ASCII_FRAME_SIZE]; // !!!size = 255
-uint8 idata data_count = 0;
-
-uint8 idata send_count = 0;
-
-bit broadcast = 0;
+uint8 ascii_frame[ASCII_FRAME_SIZE]; // !!!size = 255
+uint8 data_count = 0;
+uint8 send_count = 0;
 
 /* functions codes parameters */
 uint16 idata parameters[10];
@@ -21,7 +14,7 @@ uint8 byte_count = 0;
 
 /* functions prototypes*/
 void gen_start();
-void gen_dir(uint8);
+void gen_addr(uint8);
 void gen_function(uint8);
 void gen_lrc();
 void clear_frame();
@@ -44,7 +37,7 @@ void gen_start()
     ascii_frame[0] = 0x3A;
 }
 
-void gen_dir(uint8 val)  //Gen dir data
+void gen_addr(uint8 val)  //Gen address
 {
     ByteToAscii(val);
     ascii_frame[1] = ascii[0];
@@ -58,7 +51,7 @@ void gen_function(uint8 val) // Gen func code
     ascii_frame[4] = ascii[1];
 }
 
-void gen_lrc()
+void gen_lrc() // error check
 {
     ByteToAscii(lrc_calc());
     ascii_frame[data_count++] = ascii[0];
@@ -87,10 +80,9 @@ void tx_assci_frame()
     TI = 0;
     TB8 = 0;        
     SBUF = ascii_frame[0];
-    while ( send_count != 0 ); 
 }
 
-uint8 lrc_calc() 
+uint8 lrc_calc()  //error check longitudnal redundancy
 {
     uint8 result = 0, i = 0;    
         
@@ -108,7 +100,6 @@ void tx_byte2(char byte)     //transmit a single byte
     TI = 0;
     TB8 = 0;
     SBUF = byte;
-    while (!TI);
 }
 
 /* functions Codes */
@@ -117,7 +108,7 @@ void ReadCoilStatus_01(uint8 dir, uint16 start, uint16 cant) // 0x01, OK
     int i = 0;
 
     gen_start();
-    gen_dir(dir);
+    gen_addr(dir);
     gen_function(1);    // 0x01    
     data_count = 5;
 
