@@ -8,7 +8,6 @@ uint8 hexa[4];
 
 /* functions prototypes */
 void ByteToAscii(uint8);
-uint8 NibbleToAscii(uint8);
 uint8 AsciiToByte(uint8, uint8);
 void TwoByteToAscii(uint16);
 uint16 AsciiToTwoByte();
@@ -39,17 +38,6 @@ void ByteToAscii(uint8 val)
     return ;
 }
 
-uint8 NibbleToAscii(uint8 val)
-{     
-    if ( val <= 9 )        
-    {
-        return val + '0';
-    }
-    else
-    {
-        return (val - 10) + 'A';    
-    }        
-}
 
 uint8 AsciiToByte(uint8 a, uint8 b)
 {
