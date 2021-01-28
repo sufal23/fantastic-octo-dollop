@@ -3,6 +3,10 @@
 /* ASCII FRAME size */
 #define ASCII_FRAME_SIZE 60  //CHANGE  
 
+/* ASCII FRAME END CHARS */
+#define CR 0x0D
+#define LF 0x0A
+
 /* ASCII FRAME */
 uint8 ascii_frame[ASCII_FRAME_SIZE]; // !!!size = 255
 uint8 data_count = 0;
