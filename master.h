@@ -26,10 +26,6 @@ void ReadCoilStatus_01(uint8, uint16, uint16);
 void ReadInputStatus_02(uint8, uint16, uint16);
 void ReadHoldingRegisters_03(uint8, uint16, uint16);
 void ReadInputRegisters_04(uint8, uint16, uint16);
-void ForceSingleCoil_05(uint8, uint16, uint8);
-void PresetSingleRegister_06(uint8, uint16, uint16);
-void ForceMultipleCoils_15(uint8, uint16, uint16);
-void PresetMultipleRegisters_16(uint8, uint16, uint16);
 
 /* aux functions */
 void gen_start()
@@ -133,7 +129,7 @@ void ReadInputStatus_02(uint8 dir, uint16 start, uint16 cant) // 0x02, OK!!!
     int i = 0;
     
     gen_start();
-    gen_dir(dir);
+    gen_addr(dir);
     gen_function(2);    // 0x02    
     data_count = 5;
     
@@ -205,139 +201,3 @@ void ReadInputRegisters_04(uint8 dir, uint16 start, uint16 cant)  // 0x04 , OK!!
     tx_assci_frame();
 }
 
-void ForceSingleCoil_05(uint8 dir, uint16 coilID, uint8 value) // 0x05, OK!!
-{
-    int i = 0;
-
-    gen_start();
-    gen_dir(dir);
-    gen_function(5);    // 0x05    
-    data_count = 5;
-    
-    TwoByteToAscii(coilID - 1);
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    }     
-    
-    if ( value > 0 )
-    {
-        TwoByteToAscii(65280);  // value FF00
-    }
-    else
-    {
-        TwoByteToAscii(0);      // value 0000
-    }
-
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    }     
-
-    gen_lrc();
-
-    tx_assci_frame();
-}
-
-void PresetSingleRegister_06(uint8 dir, uint16 registerID, uint16 value) // 0x06, OK!!!
-{
-    int i = 0;
-    
-    gen_start();
-    gen_dir(dir);
-    gen_function(6);    // 0x06    
-    data_count = 5;
-    
-    TwoByteToAscii(registerID - 1);
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    }     
-    
-    TwoByteToAscii(value); 
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    }     
-
-    gen_lrc();
-
-    tx_assci_frame();
-}
-
-void ForceMultipleCoils_15(uint8 dir, uint16 start, uint16 cant)    //15  OKKK!!!
-{
-    int i = 0;
-    
-    gen_start();
-    gen_dir(dir);
-    gen_function(15);    // 0x0F  
-    data_count = 5;
-    
-    TwoByteToAscii(start - 1);
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    } 
-    
-    TwoByteToAscii(cant);
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    } 
-    
-    ByteToAscii(byte_count);
-    ascii_frame[data_count++] = ascii[0];
-    ascii_frame[data_count++] = ascii[1];
-
-    for ( i = 0; i < byte_count; i++ )
-    {
-        ByteToAscii((uint8)parameters[i]);
-        ascii_frame[data_count++] = ascii[0];
-        ascii_frame[data_count++] = ascii[1];             
-    }
-
-    gen_lrc();
-
-    tx_assci_frame();
-}
-
-void PresetMultipleRegisters_16(uint8 dir, uint16 start, uint16 cant)    //16, OK!!! 
-{
-    int i = 0;
-    
-    gen_start();
-    gen_dir(dir);
-    gen_function(16);    // 0x10h
-    data_count = 5;
-    
-    TwoByteToAscii(start - 1);
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    } 
-    
-    TwoByteToAscii(cant);
-    for ( i = 3; i >= 0; i-- )
-    {       
-        ascii_frame[data_count++] = ascii[i];     
-    } 
-    
-    ByteToAscii(byte_count * 2);
-    ascii_frame[data_count++] = ascii[0];
-    ascii_frame[data_count++] = ascii[1];
-
-    for ( i = 0; i < byte_count; i++ )
-    {
-        TwoByteToAscii(parameters[i]);
-        
-        ascii_frame[data_count++] = ascii[3];
-        ascii_frame[data_count++] = ascii[2];
-        ascii_frame[data_count++] = ascii[1];
-        ascii_frame[data_count++] = ascii[0];
-    }
-
-    gen_lrc();
-
-    tx_assci_frame();
-}
